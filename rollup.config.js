@@ -13,8 +13,8 @@ export default [
 			format: 'umd'
 		},
 		plugins: [
-			resolve(), // so Rollup can find `ms`
-			commonjs(), // so Rollup can convert `ms` to an ES module
+			resolve(), // so Rollup can find node_modules dependencies
+			commonjs(), // so Rollup can convert dependencies to ES modules
 			babel({
 				exclude: ['node_modules/**']
 			})
@@ -35,6 +35,7 @@ export default [
 			{ file: pkg.module, format: 'es' }
 		],
 		plugins: [
+			resolve(), // so Rollup can find node_modules dependencies
 			babel({
 				exclude: ['node_modules/**']
 			})
