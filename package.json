@@ -1,7 +1,7 @@
 {
   "name": "jlafer-es6pkg",
   "description": "A starter ES6 package that can be required or imported",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "main": "dist/bundle.cjs.js",
   "module": "dist/bundle.esm.js",
   "browser": "dist/bundle.umd.js",
