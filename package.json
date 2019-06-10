@@ -1,5 +1,5 @@
 {
-  "name": "es6pkg",
+  "name": "jlafer-es6pkg",
   "description": "A starter ES6 package that can be required or imported",
   "version": "1.0.0",
   "main": "dist/bundle.cjs.js",
@@ -9,8 +9,8 @@
     "ramda": "^0.26.1"
   },
   "devDependencies": {
-    "@babel/core": "^7.2.2",
-    "@babel/preset-env": "^7.2.3",
+    "@babel/core": "^7.4.4",
+    "@babel/preset-env": "^7.4.4",
     "babel-jest": "^24.8.0",
     "jest": "^24.8.0",
     "rollup": "^1.0.0",
