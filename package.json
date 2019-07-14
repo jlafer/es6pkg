@@ -9,8 +9,8 @@
     "ramda": "^0.26.1"
   },
   "devDependencies": {
-    "@babel/core": "^7.4.4",
-    "@babel/preset-env": "^7.4.4",
+    "@babel/core": "^7.5.4",
+    "@babel/preset-env": "^7.5.4",
     "babel-jest": "^24.8.0",
     "jest": "^24.8.0",
     "rollup": "^1.0.0",
