@@ -1,5 +1,10 @@
-import {plus} from './index';
+import {checkEnvVariable,
+  corsResponse, sendCorsResponse
+} from './index';
 
-test("plus performs sum", () => {
-  expect(plus(40, 2)).toEqual(42);
+const env = {
+  foo: 'bar'
+};
+test("checkEnvVariable returns value when var is in env", () => {
+  expect(checkEnvVariable(env, 'foo')).toEqual('bar');
 });

@@ -1,11 +1,13 @@
 {
-  "name": "jlafer-es6pkg",
-  "description": "A starter ES6 package that can be required or imported",
-  "version": "1.0.5",
+  "name": "jlafer-twilio-runtime-util",
+  "description": "My library of Twilio Runtime utility functions",
+  "version": "0.0.2",
   "main": "dist/bundle.cjs.js",
   "module": "dist/bundle.esm.js",
   "browser": "dist/bundle.umd.js",
   "dependencies": {
+    "axios": "^0.19.2",
+    "querystring": "^0.2.0",
     "ramda": "^0.26.1"
   },
   "devDependencies": {
