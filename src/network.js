@@ -1,10 +1,20 @@
 const querystring = require('querystring');
 const axios = require('axios');
-import {curry} from 'ramda';
+import {curry, isEmpty} from 'ramda';
 
-export function configureApi(baseURL) {
-  return {baseURL, headers: {}};
+export function setBaseUrl(baseURL) {
+  return {baseURL};
 }
+
+export const addTokenAsData = curry((Token, config) => {
+  const data = {...config.data, Token};
+  return {...config, data};
+})
+
+export const addFlexToken = curry((manager, config) => {
+  const Token = manager.store.getState().flex.session.ssoTokenPayload.token;
+  return addTokenAsData(Toekn, config);
+})
 
 export const addBasicCredentials = curry((username, password, config) => {
   return {...config,
@@ -12,14 +22,17 @@ export const addBasicCredentials = curry((username, password, config) => {
   };
 })
 
-export const addBearerToken = curry((token, config) => {
-  const headers = {...config.headers, Authorization: `Bearer ${token}`};
-  return {...config, headers};
-})
-
 export const addHeader = curry((key, value, config) => {
   const headers = {...config.headers, [key]: value};
   return {...config, headers};
+})
+
+export const addAuthorization = curry((authType, token, config) => {
+  return addHeader('Authorization', `${authType} ${token}`, config);
+})
+
+export const addBearerToken = curry((token, config) => {
+  return addAuthorization('Bearer', token, config);
 })
 
 const encodings = {
@@ -34,14 +47,15 @@ export const makeApi = (baseConfig, encoding) => {
     const headers = {...baseConfig.headers,
       'Content-Type': contentType
     };
-    const encodedData = (encoding === 'form')
-      ? querystring.stringify(data)
-      : data;
     const config = {...baseConfig,
       url, method, headers
     };
-    if (data)
-      config.data = encodedData;
+    const allData = {...config.data, ...data};
+    if (! isEmpty(allData)) {
+      config.data = (encoding === 'form')
+        ? querystring.stringify(allData)
+        : allData;
+    }
     //console.log('calling axios with config:', config);
 
     return axios(config)

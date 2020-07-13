@@ -1,17 +1,17 @@
 import {pipe} from 'ramda';
 import {
-  configureApi, addBasicCredentials, addBearerToken, addHeader
+  setBaseUrl, addBasicCredentials, addBearerToken, addTokenAsData, addHeader
 } from './index'
 
 const baseURL = 'https://my-api.com';
-const baseConfig = {baseURL, headers: {}};
+const baseConfig = {baseURL};
 
-test("configureApi returns obj with baseURL", () => {
-  expect(configureApi(baseURL)).toEqual(baseConfig);
+test("setBaseUrl returns obj with baseURL", () => {
+  expect(setBaseUrl(baseURL)).toEqual(baseConfig);
 });
 test("addBasicCredentials returns baseConfig with basic credentials", () => {
-  const config = pipe(configureApi, addBasicCredentials('foo', 'bar'));
-  expect(config(baseURL)).toEqual({...baseConfig,
+  const configureApi = pipe(setBaseUrl, addBasicCredentials('foo', 'bar'));
+  expect(configureApi(baseURL)).toEqual({...baseConfig,
     auth: {
       username: 'foo',
       password: 'bar'
@@ -19,18 +19,28 @@ test("addBasicCredentials returns baseConfig with basic credentials", () => {
   });
 });
 test("addBearerToken returns baseConfig with Bearer credentials", () => {
-  const config = pipe(configureApi, addBearerToken('foo'));
-  expect(config(baseURL)).toEqual({...baseConfig,
+  const configureApi = pipe(setBaseUrl, addBearerToken('foo'));
+  expect(configureApi(baseURL)).toEqual({...baseConfig,
     headers: {...baseConfig.headers,
       Authorization: 'Bearer foo'
     }
   });
 });
 test("addHeader returns baseConfig with custom header", () => {
-  const config = pipe(configureApi, addHeader('foo', 'bar'));
-  expect(config(baseURL)).toEqual({...baseConfig,
+  const configureApi = pipe(setBaseUrl, addHeader('foo', 'bar'));
+  expect(configureApi(baseURL)).toEqual({...baseConfig,
     headers: {...baseConfig.headers,
       foo: 'bar'
+    }
+  });
+});
+test("addTokenAsData returns baseConfig with token in data", () => {
+  const configureApi = pipe(setBaseUrl, addTokenAsData('foo'));
+  expect(configureApi(baseURL)).toEqual({
+    ...baseConfig,
+    data: {
+      ...baseConfig.data,
+      Token: 'foo'
     }
   });
 });
