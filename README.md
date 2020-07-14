@@ -90,18 +90,6 @@ callApi :: (object, string) -> object
 ```javascript
   const result = await callApi(config, '/animals', 'post', bird);
 ```
-### makeApi(baseConfig, encoding)
-This function is not curried and is used to create an API client function of (`url`, `method`, `data`).
-```
-makeApi :: (object, string) -> object
-```
-```javascript
-  const myApiClient = makeApi(myApiConfig, 'form');
-
-  const bird = {species: 'Owl', name: 'Hootie'};
-  const result = await myApiClient('/animals', 'post', bird);
-```
-
 ## Miscellaneous Functions
 The library provides a collection of miscellaneous functions that are useful when writing Twilio serverless functions.
 
