@@ -53,11 +53,14 @@ export const setEncoding = curry((encoding, config) => {
 export const makeConfig = (baseConfig, url, method, data) => {
   const config = {...baseConfig, url, method};
   const allData = {...config.data, ...data};
-  if (! isEmpty(allData)) {
-    config.data = (config.headers['Content-Type'] === 'application/x-www-form-urlencoded')
-      ? querystring.stringify(allData)
-      : allData;
+  if (isEmpty(allData))
+    return config;
+  if (config.headers['Content-Type'] === 'application/x-www-form-urlencoded') {
+    config.data = querystring.stringify(allData);
+    config.headers['Content-length'] = config.data.length;
   }
+  else
+    config.data = allData;
   return config;
 };
 

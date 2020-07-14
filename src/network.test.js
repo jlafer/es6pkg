@@ -4,6 +4,8 @@ import {
   makeConfig
 } from './index'
 
+// TODO need test case for encoding == 'form'
+
 const baseURL = 'https://my-api.com';
 const baseConfig = {
   baseURL,
