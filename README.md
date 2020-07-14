@@ -14,13 +14,16 @@ While the functions can be used in an imperative manner, they've been designed t
 import {pipe} from 'ramda';
 import {setBaseUrl, addBearerToken, addHeader, makeApi} from './index'
 
-const configureApi = pipe(setBaseUrl, addBearerToken('my-jwt-token'), addHeader('X-My-Header', 'foo'));
+const configureApi = pipe(
+  setBaseUrl,
+  addBearerToken('my-jwt-token'),
+  addHeader('X-My-Header', 'foo'),
+  setEncoding('form')
+);
 const myApiConfig = configureApi('https://my-api.com');
 
-const myApiClient = makeApi(myApiConfig, 'form');
-
 const bird = {species: 'Owl', name: 'Hootie'};
-const result = await myApiClient('/animals', 'post', bird);
+const result = await callApi(myApiConfig, '/animals', 'post', bird);
 ``` 
 
 ### setBaseUrl(url)
@@ -71,8 +74,24 @@ addHeader :: (string, string) -> object -> object
 ```javascript
   const newConfig = addHeader('X-My-Header', 'foo', config);
 ```
+### setEncoding(encoding, config)
+This curried function adds a `Content-type` header to the request and ensures that the data is sent with the proper encoding. By default, the data is treated as `json` and the `Content-type` header is set to `application/json`. Call this function with `encoding` set to `form` to set the content type to `application/x-www-form-urlencoded`.
+```
+setEncoding :: string -> object -> object
+```
+```javascript
+  setEncoding('form', config);
+```
+### callApi(config, url, method, data)
+This function is not curried and is used to call an API with the configuration created using the other helper functions.
+```
+callApi :: (object, string) -> object
+```
+```javascript
+  const result = await callApi(config, '/animals', 'post', bird);
+```
 ### makeApi(baseConfig, encoding)
-This function is not curried and is used to create the API client.
+This function is not curried and is used to create an API client function of (`url`, `method`, `data`).
 ```
 makeApi :: (object, string) -> object
 ```
