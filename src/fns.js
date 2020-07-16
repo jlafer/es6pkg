@@ -1,4 +1,5 @@
 import {curry} from 'ramda';
+import {corsResponse} from './network';
 
 const checkKeyInObj = curry((msg, obj, key) => {
   const value = obj[key];
