@@ -90,17 +90,6 @@ callApi :: (object, string) -> object
 ```javascript
   const result = await callApi(config, '/animals', 'post', bird);
 ```
-## Miscellaneous Functions
-The library provides a collection of miscellaneous functions that are useful when writing Twilio serverless functions.
-
-### checkEnvVariable(env, name)
-This function validates the presence of, and returns, the value of an environment variable. If a variable with the `name` parameter is undefined, the function throws an Error indicating as much. In the context of a Twilio Serverless function, variables are typically obtained from the `context` object parameter of the handler function.
-```
-checkEnvVariable :: (object, string) -> string
-```
-```javascript
-  const API_KEY = checkEnvVariable(context, 'API_KEY');
-```
 ### corsResponse()
 This function returns a `Twilio.Response` with all the HTTP headers needed for allowing cross-site requests, such as those from a Flex domain. Note that it sets the `Access-Control-Allow-Origin` header to `*` and you may need something more secure.
 ```
@@ -116,4 +105,82 @@ sendCorsResponse :: (string, any) -> object
 ```
 ```javascript
   const response = sendCorsResponse('json', myResponseData);
+```
+## Miscellaneous Functions
+The library provides a collection of miscellaneous functions that are useful when writing Twilio serverless functions.
+
+### trycatch({tryer, catcher, vars, params})
+This HOF returns a function that executes the `tryer` function within a `try` block. If an exception is raised, it calls the `catcher` function. Prior to calling the `tryer` function, it verifies the environment variables specified by the `vars` property and the event parameters specified by the `params` property. Both the `vars` and `params` properties are arrays of strings. For both success and failure, the returned function creates a `Twilio.Response` with the required CORS headers and sends the response to the caller of the serverless function.
+
+Both the `tryer` and `catcher` functions should return a JavaScript object, which will be used in the HTTP response. The content-type is set to `application/json`.
+
+Here are the signatures of the two function parameters:
+```
+tryer :: (context, event) -> Promise(object)
+```
+```
+catcher :: (context, event, error) -> object
+```
+For proper error reporting, the catcher function should return an object with (at least) the keys, `statusCode` and `message`. Errors are displayed in the serverless console and returned to the client (although right now, the Serverless platform returns a `500` HTTP status code and does not return the `response` content).
+```
+trycatch :: (object) -> function
+```
+Here is an example showing the use of `trycatch`.
+```javascript
+const {trycatch} = require('jlafer-twilio-runtime-util');
+const {myApiCaller} = require('my-cool-lib');
+
+async function fetchOrder(context, event) {
+  const {ORDERS_API, API_KEY, API_SECRET} = context;
+  const {OrderNumber} = event;
+  console.log(`getOrder: order number = ${OrderNumber}`);
+  return myApiCaller(ORDERS_API, API_KEY, API_SECRET, `order=${OrderNumber}`);
+};
+
+function catcher(context, event, err) {
+  console.log('catcher: err:', err);
+  return {message: `getOrder: caught ERROR -> ${err.message} <- for order ${event.number}`};
+};
+
+exports.handler = function(context, event, callback) {
+  const handler = trycatch({
+    tryer: fetchOrder,
+    catcher: catcher,
+    vars: ['ORDERS_API', 'API_KEY', 'API_SECRET'],
+    params: ['OrderNumber']
+  });
+  handler(context, event, callback);
+};
+```
+### verifyRequiredParams(names, context)
+This function validates the presence of, and returns, the value of the function parameters specified by the first parameter, which is an array of parameter names. If any of the specified parameters is undefined, the function throws an Error indicating as much. In the context of a Twilio Serverless function, parameters are obtained from the `event` object parameter of the handler function.
+```
+verifyRequiredParams :: ([string], object) -> object
+```
+```javascript
+  const params = verifyRequiredParams(['CallSid', 'Customer', 'ChannelName'], event);
+```
+### verifyRequiredVars(names, context)
+This function validates the presence of, and returns, the value of the environment variables specified by the first parameter, which is an array of variable names. If any of the specified variables is undefined, the function throws an Error indicating as much. In the context of a Twilio Serverless function, variables are typically obtained from the `context` object parameter of the handler function.
+```
+verifyRequiredVars :: ([string], object) -> object
+```
+```javascript
+  const vars = verifyRequiredVars(['API_KEY', 'API_SECRET', 'SYNC_SID'], context);
+```
+### checkEnvVariable(env, name)
+This function validates the presence of, and returns, the value of an environment variable. If a variable with the `name` parameter is undefined, the function throws an Error indicating as much. In the context of a Twilio Serverless function, variables are typically obtained from the `context` object parameter of the handler function.
+```
+checkEnvVariable :: (object, string) -> string
+```
+```javascript
+  const API_KEY = checkEnvVariable(context, 'API_KEY');
+```
+### checkParameter(event, name)
+This function validates the presence of, and returns, the value of an `event` parameter. If a parameter with the `name` parameter is undefined, the function throws an Error indicating as much. In the context of a Twilio Serverless function, parameters are obtained from the `event` object parameter of the handler function.
+```
+checkParameter :: (object, string) -> string
+```
+```javascript
+  const API_KEY = checkParameter(event, 'CallSid');
 ```

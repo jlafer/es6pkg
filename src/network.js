@@ -2,6 +2,23 @@ const querystring = require('querystring');
 const axios = require('axios');
 import {curry, isEmpty} from 'ramda';
 
+export function corsResponse() {
+  let response = new Twilio.Response();
+  response.appendHeader("Access-Control-Allow-Origin", "*");
+  response.appendHeader("Access-Control-Allow-Methods", "OPTIONS POST");
+  response.appendHeader("Access-Control-Allow-Headers", "Content-Type");
+  return response;
+}
+
+export function sendCorsResponse(format, body) {
+  const response = corsResponse();
+  if (format === "json") {
+    response.appendHeader('Content-Type', 'application/json');
+    response.setBody(body);
+  }
+  return response;
+}
+
 export function setBaseUrl(baseURL) {
   return {
     baseURL,
@@ -66,7 +83,7 @@ export const makeConfig = (baseConfig, url, method, data) => {
 
 export const callApi = (baseConfig, url, method, data) => {
   const config = makeConfig(baseConfig, url, method, data);
-  //console.log('calling axios with config:', config);
+  console.log('calling axios with config:', config);
   return axios(config)
   .then(response => response.data)
   .catch(error => {
