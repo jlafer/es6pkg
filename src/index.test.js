@@ -1,5 +1,4 @@
 import {checkEnvVariable,
-  corsResponse, sendCorsResponse
 } from './index';
 
 const env = {

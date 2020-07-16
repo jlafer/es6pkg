@@ -1,6 +1,6 @@
+import {curry, isEmpty} from 'ramda';
 const querystring = require('querystring');
 const axios = require('axios');
-import {curry, isEmpty} from 'ramda';
 
 export function corsResponse() {
   let response = new Twilio.Response();

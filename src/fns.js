@@ -1,5 +1,5 @@
 import {curry} from 'ramda';
-import {corsResponse} from './network';
+import {corsResponse} from './index';
 
 const checkKeyInObj = curry((msg, obj, key) => {
   const value = obj[key];
@@ -24,19 +24,26 @@ const verifyRequiredKeysInObj = curry((checkFn, keys, obj) => {
 export const verifyRequiredVars = verifyRequiredKeysInObj(checkEnvVariable);
 export const verifyRequiredParams = verifyRequiredKeysInObj(checkParameter);
 
-export const trycatch = (opts) => {
+/*
+  NOTE: the returned function does not use async/await do to conflict between
+    babel/rollup and async functions when nested
+  TODO check for configuration changes that will address this 
+*/
+export function trycatch(opts) {
   const {tryer, catcher, vars, params} = opts;
 
-  return async (context, event, callback) => {
+  return function(context, event, callback) {
     const response = corsResponse();
     response.appendHeader('Content-Type', 'application/json');
     try {
       verifyRequiredVars(vars, context);
       verifyRequiredParams(params, event);
-      const result = await tryer(context, event);
-      response.setStatusCode(200);
-      response.setBody(result);
-      callback(null, response);
+      tryer(context, event)
+      .then((result) => {
+        response.setStatusCode(200);
+        response.setBody(result);
+        callback(null, response);
+      })
     }
     catch (err) {
       const result = catcher(context, event, err);
