@@ -6,6 +6,8 @@
   "module": "dist/bundle.esm.js",
   "browser": "dist/bundle.umd.js",
   "dependencies": {
+    "axios": "^0.21.1",
+    "querystring": "^0.2.0",
     "ramda": "^0.26.1"
   },
   "devDependencies": {
@@ -20,6 +22,7 @@
     "rollup-plugin-node-resolve": "^4.0.0"
   },
   "scripts": {
+    "prepublishOnly": "npm run build",
     "build": "rollup -c",
     "dev": "rollup -c -w",
     "test": "jest"
